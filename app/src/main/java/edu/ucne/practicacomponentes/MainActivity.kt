@@ -1,11 +1,14 @@
 package edu.ucne.practicacomponentes
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,18 +21,23 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -68,9 +76,10 @@ class MainActivity : ComponentActivity() {
             PracticaComponentesTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                       name = "Android",
                         modifier = Modifier.padding(innerPadding)
                     )
+                    MyDialog()
                 }
             }
         }
@@ -339,4 +348,76 @@ fun  MyRadioButtons() {
             }
 
 }
+}
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun MyComboBox() {
+    val ciudades = listOf("SMF", "Tenares", "Nagua", "Castillo")
+    var ciudadSeleccionada by remember { mutableStateOf("") }
+    var expandido by remember { mutableStateOf(false) }
+
+    // Usamos Box como contenedor clickable
+    Box(modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = ciudadSeleccionada,
+            onValueChange = {},
+            label = { Text("Ciudad") },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "Desplegar opciones"
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expandido = true },
+            readOnly = true
+        )
+
+        DropdownMenu(
+            expanded = expandido,
+            onDismissRequest = { expandido = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            ciudades.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(text = item) },
+                    onClick = {
+                        ciudadSeleccionada = item
+                        expandido = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun MyDialog() {
+    var  dialogoVisible by remember {
+        mutableStateOf(true)
+    }
+    if(dialogoVisible) {
+       AlertDialog(
+           onDismissRequest = {dialogoVisible = false},
+           title = { Text("Titulo del Dialogo") },
+           text = {
+               Text("Seguro que desea salir de la aplicacion?")
+           },
+           confirmButton = {
+               TextButton(onClick = {
+                   // Cerrar la aplicacion
+                   dialogoVisible = false
+               }) {
+                   Text(text = "Aceptar") }
+           },
+           dismissButton = {
+               TextButton(onClick = {
+                   dialogoVisible = false // Solo cerrar el dialogo
+               }) { Text(text = "Cancelar") }
+           }
+       )
+    }
 }
